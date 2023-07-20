@@ -18,12 +18,63 @@ class TruthOrDareGame(tk.Tk):
         self.random_player = None
         self.random_2 = None
         self.index_2 = 0
+        self.scare = False
         self.load_truths_and_dares()
         self.create_title_screen()
 
     def load_truths_and_dares(self):
         with open("dares.txt", "r", encoding="utf-8") as dare_file:
             self.dares = dare_file.readlines()
+
+    def jumpscare(self):
+        self.clear_screen()
+        self.scare = True
+
+        self.jump_scare = tk.Label(
+                self,
+                text="JUMPSCARE!!! EVERY PLAYER MUST TAKE A 5 HOUR ENERGY",
+                font=("Comic Sans MS", 24),
+                fg="white",
+                bg="black",
+            )
+        self.jump_scare.pack()
+        self.continue_button = tk.Button(
+            self,
+            text="CONTINUE",
+            command=self.continue_game,
+            font=("Comic Sans MS", 24),
+            fg="green",
+            bg="black",
+        )
+        self.continue_button.pack()
+        image = Image.open("food.gif")
+        frames = []
+
+        # Extract individual frames from the animated GIF
+        try:
+            while True:
+                frames.append(ImageTk.PhotoImage(image))
+                image.seek(len(frames))  # Move to the next frame
+        except EOFError:
+            pass
+
+        # Create a Canvas widget to display the animated GIF
+        canvas = tk.Canvas(self, width=image.width, height=image.height, highlightthickness=0)
+        canvas.pack()
+
+        # Display the frames in a loop to simulate animation
+        delay = image.info.get('duration', 100)  # Get the frame delay (in milliseconds)
+        frame_count = len(frames)
+
+        def animate_frame(index):
+            canvas.create_image(0, 0, anchor='nw', image=frames[index])
+
+            # Move to the next frame
+            self.after(delay, animate_frame, (index + 1) % frame_count)
+
+        # Start the animation
+        animate_frame(0)
+
     def player_roll(self):
         self.random_index = random.randint(0, len(self.players) - 1)
         self.random_player = self.players[self.random_index]
@@ -127,6 +178,7 @@ class TruthOrDareGame(tk.Tk):
         self.totalshots -= 2
         for player in self.players:
             player["shot_count"] += 1
+            self.totalshots += 1 
         self.roll_label = tk.Label(
             self, text="The group has skipped, everyone take a shot.", font=("Comic Sans MS", 24), fg="red", bg="black"
         )
@@ -193,6 +245,7 @@ class TruthOrDareGame(tk.Tk):
             widget.destroy()
 
     def create_game_screen(self):
+        print(self.totalshots)
         self.roll_label = tk.Label(
             self, text="ROLL TIME!", font=("Comic Sans MS", 24), fg="white", bg="black"
         )
@@ -232,14 +285,14 @@ class TruthOrDareGame(tk.Tk):
         )
         self.dare_label.pack()
 
-        self.current_dare = "Take off your shirt until your name is picked again twice."
+        self.current_dare = "Take off your shirt until the end of the game."
 
         self.dare_text = tk.Label(
-            self, text=self.current_dare, font=("Comic Sans MS", 24), fg="red", bg="black", wraplength=400
+                self, text=self.current_dare, font=("Comic Sans MS", 24), fg="red", bg="black", wraplength=700
 
-        )
+            )
         self.dare_text.pack()
-        self.backdoor = True
+
         self.skip_button = tk.Button(
             self,
             text="SKIP",
@@ -257,7 +310,7 @@ class TruthOrDareGame(tk.Tk):
             fg="red",
             bg="black",
         )
-        self.pass_button.pack(side=tk.LEFT)
+        self.pass_button.pack(side=tk.RIGHT)
         self.done_button = tk.Button(
             self,
             text="DONE",
@@ -266,8 +319,9 @@ class TruthOrDareGame(tk.Tk):
             fg="green",
             bg="black",
         )
-        self.done_button.pack(side=tk.LEFT)
-
+        self.done_button.pack()
+    
+        
         for player in self.players:
             self.list_players = tk.Label(
                 self,
@@ -285,7 +339,17 @@ class TruthOrDareGame(tk.Tk):
             fg="blue",
             bg="black",
         )
-        self.random_roll.pack()    
+        self.random_roll.pack() 
+
+        self.add_shot = tk.Button(
+            self,
+            text="Take a shot.",
+            command=self.add,
+            font=("Comic Sans MS", 24),
+            fg="blue",
+            bg="black",
+        )
+        self.add_shot.pack() 
     def roll(self):
         if self.backdoor == False and random.randint(0, 25) == 2 and self.totalshots >= 10:
             self.clear_screen()
@@ -371,82 +435,85 @@ class TruthOrDareGame(tk.Tk):
         self.create_dare_screen()                              
 
     def create_dare_screen(self):
-        self.dare_label = tk.Label(
-            self,
-            text=str(self.current_player["name"]) + ", your dare is:",
-            font=("Comic Sans MS", 24),
-            fg="white",
-            bg="black",
-            wraplength=700
-        )
-        self.dare_label.pack()
-
-        self.current_dare = random.choice(self.dares)
-        self.dares.remove(self.current_dare)
-
-        self.dare_text = tk.Label(
-            self, text=self.current_dare, font=("Comic Sans MS", 24), fg="red", bg="black", wraplength=700
-
-        )
-        self.dare_text.pack()
-
-        self.skip_button = tk.Button(
-            self,
-            text="SKIP",
-            command=self.skip,
-            font=("Comic Sans MS", 24),
-            fg="yellow",
-            bg="black",
-        )
-        self.skip_button.pack(side=tk.LEFT)
-        self.pass_button = tk.Button(
-            self,
-            text="PASS",
-            command=self.pass_turn,
-            font=("Comic Sans MS", 24),
-            fg="red",
-            bg="black",
-        )
-        self.pass_button.pack(side=tk.RIGHT)
-        self.done_button = tk.Button(
-            self,
-            text="DONE",
-            command=self.done,
-            font=("Comic Sans MS", 24),
-            fg="green",
-            bg="black",
-        )
-        self.done_button.pack()
-      
-        
-        for player in self.players:
-            self.list_players = tk.Label(
+        if self.scare == False and self.totalshots  >= 21:
+            self.jumpscare()
+        else: 
+            self.dare_label = tk.Label(
                 self,
-                text=str(player["name"]) + ", Shot Count: " + str(player["shot_count"]) + ', Dares Completed: ' + str(player["Dares_completed"]),
+                text=str(self.current_player["name"]) + ", your dare is:",
                 font=("Comic Sans MS", 24),
                 fg="white",
                 bg="black",
+                wraplength=700
             )
-            self.list_players.pack()
-        self.random_roll = tk.Button(
-            self,
-            text="Choose Random Player",
-            command=self.player_roll,
-            font=("Comic Sans MS", 24),
-            fg="blue",
-            bg="black",
-        )
-        self.random_roll.pack() 
+            self.dare_label.pack()
 
-        self.add_shot = tk.Button(
-            self,
-            text="Take a shot.",
-            command=self.add,
-            font=("Comic Sans MS", 24),
-            fg="blue",
-            bg="black",
-        )
-        self.add_shot.pack() 
+            self.current_dare = random.choice(self.dares)
+            self.dares.remove(self.current_dare)
+
+            self.dare_text = tk.Label(
+                self, text=self.current_dare, font=("Comic Sans MS", 24), fg="red", bg="black", wraplength=700
+
+            )
+            self.dare_text.pack()
+
+            self.skip_button = tk.Button(
+                self,
+                text="SKIP",
+                command=self.skip,
+                font=("Comic Sans MS", 24),
+                fg="yellow",
+                bg="black",
+            )
+            self.skip_button.pack(side=tk.LEFT)
+            self.pass_button = tk.Button(
+                self,
+                text="PASS",
+                command=self.pass_turn,
+                font=("Comic Sans MS", 24),
+                fg="red",
+                bg="black",
+            )
+            self.pass_button.pack(side=tk.RIGHT)
+            self.done_button = tk.Button(
+                self,
+                text="DONE",
+                command=self.done,
+                font=("Comic Sans MS", 24),
+                fg="green",
+                bg="black",
+            )
+            self.done_button.pack()
+        
+            
+            for player in self.players:
+                self.list_players = tk.Label(
+                    self,
+                    text=str(player["name"]) + ", Shot Count: " + str(player["shot_count"]) + ', Dares Completed: ' + str(player["Dares_completed"]),
+                    font=("Comic Sans MS", 24),
+                    fg="white",
+                    bg="black",
+                )
+                self.list_players.pack()
+            self.random_roll = tk.Button(
+                self,
+                text="Choose Random Player",
+                command=self.player_roll,
+                font=("Comic Sans MS", 24),
+                fg="blue",
+                bg="black",
+            )
+            self.random_roll.pack() 
+
+            self.add_shot = tk.Button(
+                self,
+                text="Take a shot.",
+                command=self.add,
+                font=("Comic Sans MS", 24),
+                fg="blue",
+                bg="black",
+            )
+            self.add_shot.pack() 
 
     def add(self):
         self.current_player["shot_count"] += 1
