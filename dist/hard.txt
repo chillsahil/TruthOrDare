@@ -1,7 +1,7 @@
 moan for 10 seconds.
 Put on a blindfold and touch the other player’s faces and try to guess who it is, if you get a perfect score, youre safe, otherwise, take a shot
 do an improv comedy routine until two people laugh
-pick a number from 1-60, open the dares.txt file and do that number dare. No skipping or passing after you pick the number.
+pick a number from 1-35, open the hard.txt file and do that number dare. No skipping or passing after you pick the number.
 Share a memorable intimate experience in vivid detail with the group.
 You have to keep your hand on the very inner thigh of a random player till your name or their name is called.
 Stand on one leg for 2 minutes. Every time you fail remove an article of clothing, timer resumes when you get back on one leg 

@@ -5,7 +5,7 @@ import random
 class TruthOrDareGame(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Dare or Drink")
+        self.title("Dare or Drink v1.1")
         self.geometry("1280x900")
         self.players = []
         self.current_player_index = 0
@@ -397,7 +397,7 @@ class TruthOrDareGame(tk.Tk):
                 bg="black",
             )
             self.dare_button.pack()
-            
+            self.backdoor = True
         
         else:
             self.clear_screen()
