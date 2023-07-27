@@ -19,12 +19,17 @@ class TruthOrDareGame(tk.Tk):
         self.random_2 = None
         self.index_2 = 0
         self.scare = False
+        self.phase2 = False
         self.load_truths_and_dares()
         self.create_title_screen()
 
     def load_truths_and_dares(self):
         with open("dares.txt", "r", encoding="utf-8") as dare_file:
             self.dares = dare_file.readlines()
+
+    def load_phase2(self):
+        with open("hard.txt", "r", encoding="utf-8") as phase2_file:
+            self.dares = phase2_file.readlines()
 
     def jumpscare(self):
         self.clear_screen()
@@ -246,6 +251,9 @@ class TruthOrDareGame(tk.Tk):
 
     def create_game_screen(self):
         print(self.totalshots)
+        if self.totalshots >= 12 and self.phase2 == False:
+            self.load_phase2()
+            self.phase2 = True
         self.roll_label = tk.Label(
             self, text="ROLL TIME!", font=("Comic Sans MS", 24), fg="white", bg="black"
         )
@@ -435,7 +443,7 @@ class TruthOrDareGame(tk.Tk):
         self.create_dare_screen()                              
 
     def create_dare_screen(self):
-        if self.scare == False and self.totalshots  >= 21:
+        if self.scare == False and self.totalshots  >= 15:
             self.jumpscare()
         else: 
             self.dare_label = tk.Label(
